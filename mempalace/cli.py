@@ -160,7 +160,7 @@ def cmd_kg(args):
     from datetime import date as _date
     from .knowledge_graph import KnowledgeGraph
 
-    kg = KnowledgeGraph()
+    kg = KnowledgeGraph(db_path=getattr(args, "kg", None) or None)
     action = args.kg_action
 
     if action == "add":
@@ -477,6 +477,12 @@ def main():
 
     # kg — knowledge graph
     p_kg = sub.add_parser("kg", help="Knowledge graph: add triples, query entities, timeline")
+    p_kg.add_argument(
+        "--kg",
+        default=None,
+        metavar="PATH",
+        help="Path to knowledge_graph.sqlite3 (default: ~/.mempalace/knowledge_graph.sqlite3)",
+    )
     kg_sub = p_kg.add_subparsers(dest="kg_action")
 
     p_kg_add = kg_sub.add_parser("add", help="Add a triple: subject predicate object")
