@@ -155,6 +155,62 @@ def cmd_status(args):
     status(palace_path=palace_path)
 
 
+def cmd_kg(args):
+    """Knowledge graph: add triples, query entities, show timeline."""
+    from datetime import date as _date
+    from .knowledge_graph import KnowledgeGraph
+
+    kg = KnowledgeGraph()
+    action = args.kg_action
+
+    if action == "add":
+        today = str(_date.today())
+        kg.add_entity(args.subject)
+        kg.add_entity(args.obj)
+        triple_id = kg.add_triple(
+            subject=args.subject,
+            predicate=args.predicate,
+            obj=args.obj,
+            valid_from=args.valid_from or today,
+            confidence=args.confidence,
+            source_file=args.source or "cli",
+        )
+        print(f"  + {args.subject} --[{args.predicate}]--> {args.obj}")
+        print(f"    from: {args.valid_from or today}  source: {args.source or 'cli'}  id: {triple_id[:8]}")
+
+    elif action == "query":
+        results = kg.query_entity(args.entity, as_of=args.as_of, direction=args.direction)
+        if not results:
+            print(f"  No facts found for: {args.entity}")
+            return
+        print(f"\n  Facts for: {args.entity}  (as_of={args.as_of or 'now'})")
+        print("  " + "-" * 50)
+        for r in results:
+            valid = f"{r.get('valid_from', '?')} -> {r.get('valid_to') or 'present'}"
+            src = r.get("source_file", "")
+            print(f"  [{r['direction']}]  {r['subject']} --[{r['predicate']}]--> {r['object']}")
+            print(f"         {valid}  |  {src}")
+
+    elif action == "timeline":
+        results = kg.timeline(entity_name=args.entity)
+        if not results:
+            entity_label = args.entity or "all entities"
+            print(f"  No timeline found for: {entity_label}")
+            return
+        entity_label = args.entity or "all entities"
+        print(f"\n  Timeline: {entity_label}")
+        print("  " + "-" * 50)
+        for r in results:
+            ended = f"  [ended {r['valid_to']}]" if r.get("valid_to") else ""
+            print(f"  {r.get('valid_from', '?')}  {r['subject']} --[{r['predicate']}]--> {r['object']}{ended}")
+
+    elif action == "stats":
+        s = kg.stats()
+        print(f"\n  KG stats: {s.get('entities', 0)} entities, {s.get('triples', 0)} triples")
+        for pred, count in (s.get("predicates") or {}).items():
+            print(f"    {pred}: {count}")
+
+
 def cmd_repair(args):
     """Rebuild palace vector index from SQLite metadata."""
     import chromadb
@@ -419,6 +475,28 @@ def main():
         help="Extraction strategy for convos mode: 'exchange' (default) or 'general' (5 memory types)",
     )
 
+    # kg — knowledge graph
+    p_kg = sub.add_parser("kg", help="Knowledge graph: add triples, query entities, timeline")
+    kg_sub = p_kg.add_subparsers(dest="kg_action")
+
+    p_kg_add = kg_sub.add_parser("add", help="Add a triple: subject predicate object")
+    p_kg_add.add_argument("subject", help="Subject entity (e.g. petition053)")
+    p_kg_add.add_argument("predicate", help="Relationship (e.g. has_status, touches, references_adr)")
+    p_kg_add.add_argument("obj", help="Object entity (e.g. implemented, opendebt-debt-service)")
+    p_kg_add.add_argument("--source", default=None, help="Agent or tool that asserted this fact")
+    p_kg_add.add_argument("--from", dest="valid_from", default=None, help="Valid from date (default: today)")
+    p_kg_add.add_argument("--confidence", type=float, default=1.0, help="Confidence 0-1 (default: 1.0)")
+
+    p_kg_query = kg_sub.add_parser("query", help="Query an entity's relationships")
+    p_kg_query.add_argument("entity", help="Entity name to query")
+    p_kg_query.add_argument("--as-of", default=None, help="Point-in-time query (ISO date)")
+    p_kg_query.add_argument("--direction", choices=["in", "out", "both"], default="both")
+
+    p_kg_timeline = kg_sub.add_parser("timeline", help="Show temporal timeline for an entity")
+    p_kg_timeline.add_argument("entity", nargs="?", default=None, help="Entity name (default: all)")
+
+    kg_sub.add_parser("stats", help="Show KG statistics")
+
     # search
     p_search = sub.add_parser("search", help="Find anything, exact words")
     p_search.add_argument("query", help="What to search for")
@@ -510,6 +588,13 @@ def main():
         return
 
     # Handle two-level subcommands
+    if args.command == "kg":
+        if not getattr(args, "kg_action", None):
+            p_kg.print_help()
+            return
+        cmd_kg(args)
+        return
+
     if args.command == "hook":
         if not getattr(args, "hook_action", None):
             p_hook.print_help()
