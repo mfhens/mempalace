@@ -50,7 +50,7 @@ function Invoke-Mine {
     Write-Host ""
     Write-Host "--- $Label ---" -ForegroundColor Cyan
 
-    $cmd = "mempalace mine `"$Dir`" --mode $Mode --wing $Wing"
+    $cmd = "python -m mempalace mine `"$Dir`" --mode $Mode --wing $Wing"
     if ($DryRun) { $cmd += " --dry-run" }
 
     Write-Host "  $cmd" -ForegroundColor DarkGray
