@@ -1,11 +1,4 @@
-#!/usr/bin/env python3
-"""Quick smoke test for i18n dictionaries + Dialect integration."""
-
-import sys
-from pathlib import Path
-
-# Add parent to path so we can import mempalace
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+"""Smoke tests for i18n dictionaries + Dialect integration."""
 
 from mempalace.i18n import load_lang, t, available_languages
 from mempalace.dialect import Dialect
@@ -75,10 +68,19 @@ def test_dialect_compress_samples():
     print("  PASS: compression works for all sample languages")
 
 
-if __name__ == "__main__":
-    print("i18n smoke tests:")
-    test_all_languages_load()
-    test_interpolation()
-    test_dialect_loads_lang()
-    test_dialect_compress_samples()
-    print("\nAll tests passed.")
+def test_korean_status_drawers_uses_count():
+    """ko.json status_drawers must use {count}, not {drawers}."""
+    load_lang("ko")
+    result = t("cli.status_drawers", count=42)
+    assert "42" in result, f"Expected '42' in '{result}' -- count variable not interpolated"
+
+
+def test_from_config_defaults_to_english(tmp_path):
+    """Dialect.from_config without a lang key must not inherit module-level state."""
+    load_lang("ko")  # pollute module-level _current_lang
+
+    config_path = tmp_path / "config.json"
+    config_path.write_text('{"entities": {}}')
+
+    d = Dialect.from_config(str(config_path))
+    assert d.lang == "en", f"Expected 'en', got '{d.lang}' -- state leak from prior load_lang"

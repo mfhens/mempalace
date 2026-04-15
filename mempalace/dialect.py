@@ -362,7 +362,7 @@ class Dialect:
         return cls(
             entities=config.get("entities", {}),
             skip_names=config.get("skip_names", []),
-            lang=config.get("lang"),
+            lang=config.get("lang", "en"),
         )
 
     def save_config(self, config_path: str):
