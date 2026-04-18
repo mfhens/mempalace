@@ -854,6 +854,7 @@ def status(palace_path: str):
 
     wing_rooms = defaultdict(lambda: defaultdict(int))
     for m in metas:
+        m = m or {}
         wing_rooms[m.get("wing", "?")][m.get("room", "?")] += 1
 
     print(f"\n{'=' * 55}")

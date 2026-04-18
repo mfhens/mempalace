@@ -283,6 +283,7 @@ def search(query: str, palace_path: str, wing: str = None, room: str = None, n_r
 
     for i, (doc, meta, dist) in enumerate(zip(docs, metas, dists), 1):
         similarity = round(max(0.0, 1 - dist), 3)
+        meta = meta or {}
         source = Path(meta.get("source_file", "?")).name
         wing_name = meta.get("wing", "?")
         room_name = meta.get("room", "?")
@@ -372,6 +373,7 @@ def search_memories(
                 _first_or_empty(closet_results, "distances"),
             )
         ):
+            cmeta = cmeta or {}
             source = cmeta.get("source_file", "")
             if source and source not in closet_boost_by_source:
                 closet_boost_by_source[source] = (rank, cdist, cdoc[:200])
@@ -394,6 +396,7 @@ def search_memories(
         if max_distance > 0.0 and dist > max_distance:
             continue
 
+        meta = meta or {}
         source = meta.get("source_file", "") or ""
         boost = 0.0
         matched_via = "drawer"
