@@ -3,12 +3,13 @@ import shutil
 import tempfile
 from pathlib import Path
 
+import chromadb
 import yaml
 
 from mempalace.miner import load_config, chunk_python_ast, mine, scan_project, status
-from mempalace.palace import NORMALIZE_VERSION, (
+from mempalace.palace import (
+    NORMALIZE_VERSION,
     file_already_mined,
-    get_client,
     get_collection as get_palace_collection,
 )
 

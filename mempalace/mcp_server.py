@@ -70,6 +70,7 @@ from .palace_graph import (  # noqa: E402
     follow_tunnels,
 )
 
+from .palace import distance_to_similarity, get_embedding_function  # noqa: E402
 from .knowledge_graph import KnowledgeGraph  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stderr)

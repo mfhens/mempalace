@@ -21,8 +21,6 @@ from .palace import get_closets_collection, get_collection
 # Multiple lines may join with newlines inside one closet document.
 _CLOSET_DRAWER_REF_RE = re.compile(r"→([\w,]+)")
 
-from .palace import distance_to_similarity, get_embedding_function
-
 logger = logging.getLogger("mempalace_mcp")
 _TOKEN_RE = re.compile(r"[a-z0-9_]+")
 

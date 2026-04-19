@@ -28,10 +28,10 @@ os.environ["HOMEPATH"] = os.path.splitdrive(_session_tmp)[1] or _session_tmp
 
 # Now it is safe to import mempalace modules that trigger initialisation.
 import pytest  # noqa: E402
+import chromadb  # noqa: E402
 
 from mempalace.config import MempalaceConfig  # noqa: E402
 from mempalace.knowledge_graph import KnowledgeGraph  # noqa: E402
-from mempalace.palace import get_client, get_collection as get_palace_collection  # noqa: E402
 
 
 @pytest.fixture(autouse=True)

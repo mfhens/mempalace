@@ -705,7 +705,7 @@ def process_file(
         drawers_added = 0
         for chunk in chunks:
             extra = {k: v for k, v in chunk.items() if k not in ("content", "chunk_index")}
-        added = add_drawer(
+            added = add_drawer(
                 collection=collection,
                 wing=wing,
                 room=room,
@@ -714,7 +714,7 @@ def process_file(
                 chunk_index=chunk["chunk_index"],
                 agent=agent,
                 extra_metadata=extra or None,
-        )
+            )
             if added:
                 drawers_added += 1
 

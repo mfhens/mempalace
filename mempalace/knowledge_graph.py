@@ -58,6 +58,7 @@ class KnowledgeGraph:
             pass
         self._connection = None
         self._lock = threading.Lock()
+        self._local = threading.local()
         self._init_db()
 
     def _init_db(self):

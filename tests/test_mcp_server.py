@@ -12,7 +12,7 @@ import sys
 
 import pytest
 
-from mempalace.palace import get_client, get_collection as get_palace_collection
+from mempalace.palace import get_client
 
 
 def _patch_mcp_server(monkeypatch, config, kg):

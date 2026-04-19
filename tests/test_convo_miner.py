@@ -1,13 +1,12 @@
 import os
 import shutil
 import tempfile
-import shutil
 from pathlib import Path
 
 import chromadb
 
 from mempalace.convo_miner import mine_convos
-from mempalace.palace import file_already_mined
+from mempalace.palace import file_already_mined, get_collection as get_palace_collection
 
 
 def test_convo_mining():
