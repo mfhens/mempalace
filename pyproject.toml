@@ -38,6 +38,16 @@ Repository = "https://github.com/MemPalace/mempalace"
 
 [project.scripts]
 mempalace = "mempalace.cli:main"
+mempalace-mcp = "mempalace.mcp_server:main"
+
+[project.entry-points."mempalace.backends"]
+chroma = "mempalace.backends.chroma:ChromaBackend"
+
+# RFC 002 source-adapter entry-point group. Core publishes no first-party
+# adapters under this group yet; ``miner.py`` and ``convo_miner.py`` migrate
+# onto ``BaseSourceAdapter`` in a follow-up PR. Third-party adapter packages
+# (``mempalace-source-cursor``, ``mempalace-source-git``, …) register here.
+[project.entry-points."mempalace.sources"]
 
 [project.entry-points."mempalace.backends"]
 chroma = "mempalace.backends.chroma:ChromaBackend"
